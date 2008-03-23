@@ -1,0 +1,17 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Data/Validate/WithYAML.pm
+t/00-load.t
+t/01_base.t
+t/02_check_value.t
+t/03_check_ages.t
+t/04_fieldnames.t
+t/99_check_manifest.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/test.yml

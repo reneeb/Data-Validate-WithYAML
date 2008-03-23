@@ -1,0 +1,20 @@
+---
+name: GPW-PerfectNumber
+version: 0.01
+author:
+  - 'Renee Baecker <module@renee-baecker.de>'
+abstract: Validate Data with YAML configuration
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+  YAML::Tiny: 1.03
+provides:
+  Data::Validate::WithYAML:
+    file: lib/Data/Validate/WithYAML.pm
+    version: 0.01
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
