@@ -12,11 +12,11 @@ Data::Validate::WithYAML - Validate Data with YAML configuration
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 my (%required,%optional);
 our $errstr = '';
 
@@ -84,6 +84,36 @@ sub new{
     return $self;
 }
 
+=head2 set_optional
+
+This method makes a field optional if it was required
+
+=cut
+
+sub set_optional {
+    my ($self,$field) = @_;
+    
+    my $value = delete $required{$field};
+    if( $value ) {
+        $optional{$field} = $value;
+    }
+}
+
+=head2 set_required
+
+This method makes a field required if it was optional
+
+=cut
+
+sub set_required {
+    my ($self,$field) = @_;
+    
+    my $value = delete $optional{$field};
+    if( $value ) {
+        $required{$field} = $value;
+    }
+}
+
 =head2 validate
 
 This subroutine validates one form. You have to pass the form name (key in the
@@ -131,6 +161,27 @@ sub errstr{
     return $errstr;
 }
 
+=head2 message
+
+returns the message if specified in YAML
+
+  $obj->message( 'fieldname' );
+
+=cut
+
+sub message {
+    my ($self,$field) = @_;
+    
+    my $subhash = $required{$field} || $optional{$field};
+    my $message = "";
+    
+    if ( $subhash->{message} ) {
+        $message = $subhash->{message};
+    }
+
+    $message;
+}
+
 =head2 check
 
   $obj->check('fieldname','value');
@@ -143,18 +194,20 @@ returns 0.
 sub check{
     my ($self,$field,$value) = @_;
     
-    my %dispatch = (min    => \&_min,
-                    max    => \&_max,
-                    regex  => \&_regex,
-                    length => \&_length,
-                    enum   => \&_enum,);
+    my %dispatch = (
+        min    => \&_min,
+        max    => \&_max,
+        regex  => \&_regex,
+        length => \&_length,
+        enum   => \&_enum,
+    );
                     
     my $subhash = $required{$field} || $optional{$field};
     
     if( exists $required{$field} ){
-        return 0 unless length $value;
+        return 0 unless defined $value and length $value;
     }
-    elsif( exists $optional{$field} and (not $value or not length $value) ){
+    elsif( exists $optional{$field} and (not defined $value or not length $value) ){
         return 1;
     }
     

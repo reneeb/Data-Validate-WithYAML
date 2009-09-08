@@ -1,6 +1,6 @@
 ---
-name: GPW-PerfectNumber
-version: 0.01
+name: Data-Validate-WithYAML
+version: 0.04
 author:
   - 'Renee Baecker <module@renee-baecker.de>'
 abstract: Validate Data with YAML configuration
@@ -13,7 +13,7 @@ build_requires:
 provides:
   Data::Validate::WithYAML:
     file: lib/Data/Validate/WithYAML.pm
-    version: 0.01
+    version: 0.04
 generated_by: Module::Build version 0.28
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
