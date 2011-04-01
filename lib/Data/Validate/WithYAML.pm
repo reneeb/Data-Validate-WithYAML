@@ -12,11 +12,11 @@ Data::Validate::WithYAML - Validate Data with YAML configuration
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 my (%required,%optional);
 our $errstr = '';
 
@@ -356,10 +356,10 @@ L<http://search.cpan.org/dist/Data::Validate::WithYAML>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007 Renee Baecker, all rights reserved.
+Copyright 2007  - 2010 Renee Baecker, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+under the terms of Artistic License 2.0.
 
 =cut
 
