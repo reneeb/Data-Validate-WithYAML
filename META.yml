@@ -1,20 +1,24 @@
 ---
-name: Data-Validate-WithYAML
-version: 0.04
+abstract: 'Validate Data with YAML configuration'
 author:
   - 'Renee Baecker <module@renee-baecker.de>'
-abstract: Validate Data with YAML configuration
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
 build_requires:
+  Test::CheckManifest: 1
   Test::More: 0
-  YAML::Tiny: 1.03
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Validate-WithYAML
 provides:
   Data::Validate::WithYAML:
     file: lib/Data/Validate/WithYAML.pm
-    version: 0.04
-generated_by: Module::Build version 0.28
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: 0.06
+requires:
+  YAML::Tiny: 1.03
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

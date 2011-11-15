@@ -1,5 +1,10 @@
 Revision history for Data::Validate::WithYAML
 
+0.06    15.11.2011
+        + added "subs" to execute user defined code
+        + added "exception" to fieldnames to exclude a given list
+        + added check_list to check a list of values for a given field
+
 0.05    08.09.2009
         + add methods "set_optional" and "set_required"
 
