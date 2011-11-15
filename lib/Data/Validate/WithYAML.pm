@@ -12,11 +12,11 @@ Data::Validate::WithYAML - Validate Data with YAML configuration
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 my (%required,%optional);
 our $errstr = '';
 
@@ -265,7 +265,7 @@ sub check{
             eval "use $module";
             
             if( not $@ and $module->can('check') ){
-                my $retval = $module->check($value);
+                my $retval = $module->check($value, $subhash);
                 $bool = 0 unless $retval;
             }
             else{

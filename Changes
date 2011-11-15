@@ -1,5 +1,8 @@
 Revision history for Data::Validate::WithYAML
 
+0.07    15.11.2011
+        + pass config to plugin
+
 0.06    15.11.2011
         + added "subs" to execute user defined code
         + added "exception" to fieldnames to exclude a given list

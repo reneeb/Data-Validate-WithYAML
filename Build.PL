@@ -12,7 +12,7 @@ my $builder = Module::Build->new(
     },
     build_requires => {
         'Test::More'          => 0,
-        'Test::CheckManifest' => 1.0,
+        'Test::CheckManifest' => 1.22,
     },
     add_to_cleanup      => [ 'Data::Validate::WithYAML-*' ],
 );
