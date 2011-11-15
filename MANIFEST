@@ -15,9 +15,13 @@ t/04_fieldnames.t
 t/05_message.t
 t/06_set_required.t
 t/07_set_optional.t
+t/08_subs.t
+t/09_fieldname_exclude.t
+t/10_subs_not_allowed.t
 t/99_check_manifest.t
 t/boilerplate.t
 t/pod-coverage.t
 t/pod.t
 t/test.yml
 t/test2.yml
+t/test3.yml

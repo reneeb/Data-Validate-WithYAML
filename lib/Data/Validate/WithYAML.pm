@@ -74,12 +74,13 @@ creates a new object.
 =cut
 
 sub new{
-    my ($class,$filename) = @_;
+    my ($class,$filename,%args) = @_;
     
     my $self = {};
     bless $self,$class;
     
     $self->_yaml_config($filename) or return undef;
+    $self->_allow_subs($args{allow_subs});
     
     return $self;
 }
@@ -136,7 +137,7 @@ sub validate{
 =cut
 
 sub fieldnames{
-    my ($self,$step) = @_;
+    my ($self,$step,%options) = @_;
     
     my @names;
     if( defined $step ){
@@ -146,6 +147,15 @@ sub fieldnames{
         for my $step ( keys %{ $self->{fieldnames} } ){
             push @names, @{ $self->{fieldnames}->{$step} };
         }
+    }
+    
+    if ( $options{exclude} ) {
+        my %hash;
+        @hash{@names} = (1) x @names;
+        
+        delete @hash{ @{$options{exclude}} };
+        
+        @names = keys %hash;
     }
     
 
@@ -182,6 +192,34 @@ sub message {
     $message;
 }
 
+=head2 check_list
+
+  $obj->check_list('fieldname',['value','value2']);
+
+Checks if the values match the validation criteria. Returns an arrayref with
+checkresults:
+
+    [
+        1,
+        0,
+    ] 
+
+=cut
+
+sub check_list {
+    my ($self,$field,$values) = @_;
+    
+    return if !$values;
+    return if ref $values ne 'ARRAY';
+    
+    my @results;
+    for my $value ( @{$values} ) {
+        push @results, $self->check( $field, $value ) ? 1 : 0;
+    }
+    
+    return \@results;
+}
+
 =head2 check
 
   $obj->check('fieldname','value');
@@ -200,6 +238,7 @@ sub check{
         regex  => \&_regex,
         length => \&_length,
         enum   => \&_enum,
+        sub    => \&_sub,
     );
                     
     my $subhash = $required{$field} || $optional{$field};
@@ -215,7 +254,7 @@ sub check{
     
     for my $key( keys %$subhash ){
         if( exists $dispatch{$key} ){
-            unless($dispatch{$key}->($value,$subhash->{$key})){
+            unless($dispatch{$key}->($value,$subhash->{$key},$self)){
                 $bool = 0;
                 last;
             }
@@ -310,6 +349,22 @@ sub _length{
 sub _enum{
     my ($value,$list) = @_;
     return grep{ $_ eq $value }@$list;
+}
+
+sub _sub {
+    my ($value,$sub,$self) = @_;
+    $_ = $value;
+    
+    croak "Can't use user defined sub unless it is allowed" if !$self->_allow_subs;
+    
+    return eval "$sub";
+}
+
+sub _allow_subs {
+    my ($self,$value) = @_;
+    
+    $self->{__allow_subs} = $value if @_ == 2;
+    $self->{__allow_subs};
 }
 
 =head1 AUTHOR
