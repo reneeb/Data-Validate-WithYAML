@@ -6,17 +6,15 @@ use warnings;
 use Carp;
 use YAML::Tiny;
 
-=head1 NAME
-
-Data::Validate::WithYAML - Validate Data with YAML configuration
+# ABSTRACT: Validation framework that can be configured with YAML files
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 my (%required,%optional);
 our $errstr = '';
 
@@ -411,7 +409,7 @@ L<http://search.cpan.org/dist/Data::Validate::WithYAML>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007  - 2010 Renee Baecker, all rights reserved.
+Copyright 2007  - 2012 Renee Baecker, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of Artistic License 2.0.
