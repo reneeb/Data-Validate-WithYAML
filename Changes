@@ -1,5 +1,11 @@
 Revision history for Data::Validate::WithYAML
 
+0.09    29.01.2012
+        + bring "validate" to life
+        + now you can depend on other fields when you use "validate"
+        + add "no_validate" to yaml spec
+        + add tests for new features
+
 0.08    03.01.2012
         + switch to Dist::Zilla
 
