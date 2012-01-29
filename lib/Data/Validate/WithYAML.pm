@@ -8,8 +8,7 @@ use YAML::Tiny;
 
 # ABSTRACT: Validation framework that can be configured with YAML files
 
-
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our $errstr  = '';
 
 =head1 SYNOPSIS
