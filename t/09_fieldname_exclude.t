@@ -28,7 +28,7 @@ my %check_hash;
 @check_hash{@check1,@check2} = undef;
 delete $check_hash{age};
 
-my @names = $validator->fieldnames( undef, exclude => [ 'age' ] );
+my @names = eval { $validator->fieldnames( undef, exclude => [ 'age' ] ) };
 my %test_hash;
 @test_hash{@names} = undef;
 

@@ -2,8 +2,9 @@ Revision history for Data::Validate::WithYAML
 =============================================
 
 0.10    2013-10-14
-        + make "step" optional
-        + handle hashref with options for validate
+        + Update Meta files
+        + when configuration files are splitted in single files, the won't have "steps".
+          Enable "no_steps" feature...
 
 0.09    2012-01-29
         + bring "validate" to life

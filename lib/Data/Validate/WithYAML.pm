@@ -8,7 +8,7 @@ use YAML::Tiny;
 
 # ABSTRACT: Validation framework that can be configured with YAML files
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our $errstr  = '';
 
 =head1 SYNOPSIS
@@ -59,6 +59,11 @@ data.yml
 =head2 new
 
   my $foo = Data::Validate::WithYAML->new( 'filename' );
+  my $foo = Data::Validate::WithYAML->new(
+      'filename',
+      allow_subs => 1,
+      no_steps   => 1,
+  );
 
 creates a new object.
 
@@ -73,8 +78,9 @@ sub new{
     $self->{__optional__} = {};
     $self->{__required__} = {};
     
-    $self->_yaml_config($filename) or return undef;
-    $self->_allow_subs($args{allow_subs});
+    $self->_allow_subs( $args{allow_subs} );
+    $self->_no_steps( $args{no_steps} );
+    $self->_yaml_config( $filename ) or return undef;
     
     return $self;
 }
@@ -87,6 +93,12 @@ sub _optional {
 sub _required {
     my ($self) = @_;
     $self->{__required__};
+}
+
+sub _no_steps {
+    my ($self, $no_steps) = @_;
+    $self->{__no_steps__} = $no_steps if @_ == 2;;
+    $self->{__no_steps__};
 }
 
 =head2 set_optional
@@ -133,8 +145,18 @@ config file), a hash with fieldnames and its values
 =cut
 
 sub validate{
-    my ($self,$part,%hash) = @_;
-    
+    my $self = shift;
+
+    my ($part, %hash);
+
+    if ( @_ && @_ % 2 == 0 ) {
+        %hash = @_;
+        $part = '';
+    }
+    else {
+        ($part, %hash) = @_;
+    }
+
     my @fieldnames  = $self->fieldnames( $part );
     
     my %errors;
@@ -158,15 +180,15 @@ sub validate{
                 next;
             }
             
-            my $depens_on_value = $hash{$depends_on};
-            my $cases = $fields{$name}->{case} || {};
+            my $depends_on_value = $hash{$depends_on};
+            my $cases            = $fields{$name}->{case} || {};
             
             #if ( !$cases->{$value} ) {
             #    $errors{$name} = $self->message( $name );
             #    next;
             #}
             
-            $fields{$name} = $cases->{$depens_on_value} if $cases->{$depens_on_value};
+            $fields{$name} = $cases->{$depends_on_value} if $cases->{$depends_on_value};
         }
         
         $fields{$name}->{type} ||= 'optional';
@@ -184,11 +206,21 @@ sub validate{
 =cut
 
 sub fieldnames{
-    my ($self,$step,%options) = @_;
-    
+    my $self = shift;
+
+    my ($step, %options);
+
+    if ( @_ && @_ % 2 == 0 ) {
+        %options = @_;
+        $step = '';
+    }
+    else {
+        ($step, %options) = @_;
+    }
+
     my @names;
     if( defined $step ){
-        @names = @{ $self->{fieldnames}->{$step} };
+        @names = @{ $self->{fieldnames}->{$step} || [] };
     }
     else{
         for my $step ( keys %{ $self->{fieldnames} } ){
@@ -337,21 +369,13 @@ sub _yaml_config{
         $self->{config} = YAML::Tiny->read( $file ) or 
                 (($errstr = YAML::Tiny->errstr()) && return undef);
 
-        for my $section(keys %{$self->{config}->[0]}){
-            my $sec_hash = $self->{config}->[0]->{$section};
-            for my $field(keys %$sec_hash){
-                if(exists $sec_hash->{$field}->{type} and 
-                          $sec_hash->{$field}->{type} eq 'required'){
-                    $self->_required->{$field} = $sec_hash->{$field};
-                    if( exists $self->_optional->{$field} ){
-                        delete $self->_optional->{$field};
-                    }
-                }
-                elsif( not exists $self->_required->{$field} ){
-                    $self->_optional->{$field} = $sec_hash->{$field};
-                }
-
-                push @{$self->{fieldnames}->{$section}}, $field;
+        if ( $self->_no_steps ) {
+            $self->_add_fields( $self->{config}->[0], '' );
+        }
+        else {
+            for my $section(keys %{$self->{config}->[0]}){
+                my $sec_hash = $self->{config}->[0]->{$section};
+                $self->_add_fields( $sec_hash, $section );
             }
         }
     }
@@ -361,6 +385,26 @@ sub _yaml_config{
     }
     
     return $self->{config};
+}
+
+sub _add_fields {
+    my ($self, $data, $section) = @_;
+
+    for my $field( keys %$data ){
+        if(exists $data->{$field}->{type} and
+                  $data->{$field}->{type} eq 'required'){
+            $self->_required->{$field} = $data->{$field};
+
+            if( exists $self->_optional->{$field} ){
+                delete $self->_optional->{$field};
+            }
+        }
+        elsif( not exists $self->_required->{$field} ){
+            $self->_optional->{$field} = $data->{$field};
+        }
+
+        push @{$self->{fieldnames}->{$section}}, $field;
+    }
 }
 
 sub _min{
@@ -419,55 +463,4 @@ sub _allow_subs {
     $self->{__allow_subs};
 }
 
-=head1 AUTHOR
-
-Renee Baecker, C<< <module at renee-baecker.de> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-data-validate-withyaml at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data::Validate::WithYAML>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Data::Validate::WithYAML
-
-You can also look for information at:
-
-=over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Data::Validate::WithYAML>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Data::Validate::WithYAML>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data::Validate::WithYAML>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Data::Validate::WithYAML>
-
-=back
-
-=head1 ACKNOWLEDGEMENTS
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2007  - 2012 Renee Baecker, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of Artistic License 2.0.
-
-=cut
-
-1; # End of Data::Validate::WithYAML
+1;
