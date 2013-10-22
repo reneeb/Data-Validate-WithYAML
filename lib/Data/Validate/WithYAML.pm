@@ -8,7 +8,7 @@ use YAML::Tiny;
 
 # ABSTRACT: Validation framework that can be configured with YAML files
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our $errstr  = '';
 
 =head1 SYNOPSIS
@@ -359,6 +359,41 @@ sub check{
     }
     
     return $bool;
+}
+
+=head2 fieldinfo
+
+Returns the config for the given field.
+
+Your test.yml:
+
+  ---
+  age:
+    type: required
+    min: 18
+    max: 65
+
+Your script:
+
+    my $info = $validator->fieldinfo( 'age' );
+
+C<$info> is a hashreference then:
+
+    {
+        type => 'required',
+        min  => 18,
+        max  => 65,
+    }
+
+=cut
+
+sub fieldinfo {
+    my ($self, $field) = @_;
+
+    my $info = $self->_required->{$field} || $self->_optional->{$field};
+    return if !$info;
+
+    return $info;
 }
 
 # read config file and parse required and optional fields

@@ -1,9 +1,12 @@
 Revision history for Data::Validate::WithYAML
 =============================================
 
+0.11    2013-10-22
+        + add method to get config for a field (fieldinfo)
+
 0.10    2013-10-14
         + Update Meta files
-        + when configuration files are splitted in single files, the won't have "steps".
+        + when configuration files are splitted in single files, they won't have "steps".
           Enable "no_steps" feature...
 
 0.09    2012-01-29
