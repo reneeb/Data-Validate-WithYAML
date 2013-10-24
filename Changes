@@ -1,6 +1,9 @@
 Revision history for Data::Validate::WithYAML
 =============================================
 
+0.12    2013-10-24
+        + add a testfile for "depends_on"
+
 0.11    2013-10-22
         + add method to get config for a field (fieldinfo)
 

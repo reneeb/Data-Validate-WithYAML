@@ -8,7 +8,7 @@ use YAML::Tiny;
 
 # ABSTRACT: Validation framework that can be configured with YAML files
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $errstr  = '';
 
 =head1 SYNOPSIS
@@ -167,7 +167,7 @@ sub validate{
     for my $name ( @fieldnames ) {
         $fields{$name} = $optional->{$name} if exists $optional->{$name};
         $fields{$name} = $required->{$name} if exists $required->{$name};
-        
+
         next if !$fields{$name};
         next if $fields{$name}->{no_validate};
         
