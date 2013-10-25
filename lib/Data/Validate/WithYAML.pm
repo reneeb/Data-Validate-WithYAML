@@ -8,7 +8,7 @@ use YAML::Tiny;
 
 # ABSTRACT: Validation framework that can be configured with YAML files
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our $errstr  = '';
 
 =head1 SYNOPSIS
@@ -175,22 +175,19 @@ sub validate{
         
         my $depends_on = $fields{$name}->{depends_on};
         if ( $depends_on ) {
-            if ( !$hash{$depends_on} ) {
+            if ( !exists $hash{$depends_on} && !$fields{$name}->{depends_lax} ) {
                 $errors{$name} = $self->message( $name );
                 next;
             }
+            elsif ( defined $hash{$depends_on} ) {
             
-            my $depends_on_value = $hash{$depends_on};
-            my $cases            = $fields{$name}->{case} || {};
+                my $depends_on_value = $hash{$depends_on};
+                my $cases            = $fields{$name}->{case} || {};
             
-            #if ( !$cases->{$value} ) {
-            #    $errors{$name} = $self->message( $name );
-            #    next;
-            #}
-            
-            $fields{$name} = $cases->{$depends_on_value} if $cases->{$depends_on_value};
+                $fields{$name} = $cases->{$depends_on_value} if $cases->{$depends_on_value};
+            }
         }
-        
+
         $fields{$name}->{type} ||= 'optional';
         my $success = $self->check( $name, $hash{$name}, $fields{$name} );
         if ( !$success ) {
@@ -320,7 +317,7 @@ sub check{
     );
                 
     my $subhash = $definition || $self->_required->{$field} || $self->_optional->{$field};
-    
+
     if(
         ( $definition and $definition->{type} eq 'required' )
         or ( !$definition and exists $self->_required->{$field} )
@@ -418,7 +415,7 @@ sub _yaml_config{
         $errstr = 'file does not exist';
         return undef;
     }
-    
+
     return $self->{config};
 }
 
@@ -473,7 +470,7 @@ sub _length{
         return $bool;
     }
     else{
-        return length $value > $check;
+        return length $value == $check;
     }
 }
 
@@ -499,3 +496,93 @@ sub _allow_subs {
 }
 
 1;
+
+=head1 FIELDCONFIG
+
+These config options can be used to configure a field:
+
+=over 4
+
+=item * type
+
+mandatory. It defines if a value is I<required> or I<optional>
+
+=item * regex
+
+A value for this field is valid if the value matches this regular expression
+
+=item * min
+
+For numeric fields. A valid value must be greater than the value given for I<min>
+
+=item * max
+
+Also for numeric fields. A valid value must be lower than the value given for I<max>
+
+=item * enum
+
+A list of valid values.
+
+=item * sub
+
+e.g.
+
+  sub: { $_ eq 'test' }
+
+A codeblock that is C<eval>ed. You can only use this option when you set I<allow_subs> in
+constructor call.
+
+=item * length
+
+A value for the field must be of length within this range
+
+  length: 1,
+
+longer than 1 char.
+
+  length: 3,5
+
+length must be between 3 and 5 chars
+
+  length: ,5
+
+Value must be at longest 5 chars.
+
+  length: 3
+
+Length must be exactly 3 chars
+
+=item * depends_on
+
+Change the config for a field depending on an other field. This only works when C<validate> is called.
+
+=item * case
+
+List of values the field it depends on can have. In case the field it depends on has a value listed in
+I<case>, the default config for the file is changed.
+
+  password:
+     type: required
+     length: 1,
+     depends_on: group
+     case:
+         admin:
+             length: 10,
+         agent:
+             length: 5,
+
+If the value for I<group> is "admin", the given password must be longer than 10 chars, for agents the
+password must be longer than 5 chars and for every other group the password must be longer than 1 char.
+    
+
+=item * depends_lax
+
+Without this setting, a value for the field this field depends on must be given.
+
+=item * plugin
+
+Use a plugin (e.g. C<Data::Validate::WithYAML::Plugin::EMail>) to check the value.
+
+  plugin: EMail
+
+=back

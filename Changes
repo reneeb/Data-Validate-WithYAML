@@ -1,6 +1,10 @@
 Revision history for Data::Validate::WithYAML
 =============================================
 
+0.14    2013-10-25
+        + added "depends_lax" (incl. tests)
+        + added docs for config settings
+
 0.13    2013-10-24
         + added PodWeaver in dist.ini
 
