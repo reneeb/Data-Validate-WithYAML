@@ -343,7 +343,7 @@ sub check{
             }
         }
         elsif( $key eq 'plugin' ){
-            my $name     = $subhash->{$key};
+            my ($name)   = $subhash->{$key} =~ m{([A-z0-9_:]+)};
             my $module   = 'Data::Validate::WithYAML::Plugin::' . $name;
             eval "use $module";
             
