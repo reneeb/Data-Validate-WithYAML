@@ -605,6 +605,20 @@ password must be longer than 5 chars and for every other group the password must
 
 Without this setting, a value for the field this field depends on must be given.
 
+=item * datatype
+
+For a few types of values there are predefined checks.
+
+=over 4
+
+=item * num
+
+=item * int
+
+=item * positive_int
+
+=back
+
 =item * plugin
 
 Use a plugin (e.g. C<Data::Validate::WithYAML::Plugin::EMail>) to check the value.
