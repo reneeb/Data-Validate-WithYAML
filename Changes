@@ -1,6 +1,11 @@
 Revision history for Data::Validate::WithYAML
 =============================================
 
+0.15    2014-01-16
+        + added "datatype" (incl. tests)
+        - removed boilerplate tests
+        + added tests for exceptions
+
 0.14    2013-10-25
         + added "depends_lax" (incl. tests)
         + added docs for config settings
