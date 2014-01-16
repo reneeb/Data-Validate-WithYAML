@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Carp;
+use Scalar::Util qw(looks_like_number);
 use YAML::Tiny;
 
 # ABSTRACT: Validation framework that can be configured with YAML files
@@ -308,12 +309,13 @@ sub check{
     my ($self,$field,$value,$definition) = @_;
     
     my %dispatch = (
-        min    => \&_min,
-        max    => \&_max,
-        regex  => \&_regex,
-        length => \&_length,
-        enum   => \&_enum,
-        sub    => \&_sub,
+        min      => \&_min,
+        max      => \&_max,
+        regex    => \&_regex,
+        length   => \&_length,
+        enum     => \&_enum,
+        sub      => \&_sub,
+        datatype => \&_datatype,
     );
                 
     my $subhash = $definition || $self->_required->{$field} || $self->_optional->{$field};
@@ -441,11 +443,13 @@ sub _add_fields {
 
 sub _min{
     my ($value,$min) = @_;
+    return if !looks_like_number $value;
     return $value >= $min;
 }
 
 sub _max{
     my ($value,$max) = @_;
+    return if !looks_like_number $value;
     return $value <= $max;    
 }
 
@@ -493,6 +497,28 @@ sub _allow_subs {
     
     $self->{__allow_subs} = $value if @_ == 2;
     $self->{__allow_subs};
+}
+
+sub _datatype {
+    my ($value, $type) = @_;
+
+    $type = lc $type;
+
+    if ( $type eq 'int' ) {
+        return if !looks_like_number $value;
+        return if $value !~ m{\A [+-]? \d+ (?:[eE]\d+)? \z}xms;
+        return 1;
+    }
+    elsif ( $type eq 'num' ) {
+        return if !looks_like_number $value;
+        return 1;
+    }
+    elsif ( $type eq 'positive_int' ) {
+        return if !looks_like_number $value;
+        return _datatype( $value, 'int' ) && $value > 0;
+    }
+
+    croak "Unknown datatype $type";
 }
 
 1;
