@@ -400,8 +400,13 @@ sub _yaml_config{
     my ($self,$file) = @_;
     
     if(defined $file and -e $file){
-        $self->{config} = YAML::Tiny->read( $file ) or 
-                (($errstr = YAML::Tiny->errstr()) && return undef);
+        eval {
+            $self->{config} = YAML::Tiny->read( $file );
+            1;
+        } or do { 
+            $errstr = $@;
+            return undef;
+        };
 
         if ( $self->_no_steps ) {
             $self->_add_fields( $self->{config}->[0], '' );
