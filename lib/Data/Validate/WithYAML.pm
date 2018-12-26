@@ -169,7 +169,6 @@ sub validate{
         $fields{$name} = $optional->{$name} if exists $optional->{$name};
         $fields{$name} = $required->{$name} if exists $required->{$name};
 
-        next if !$fields{$name};
         next if $fields{$name}->{no_validate};
         
         my $value = $hash{$name};
@@ -348,8 +347,7 @@ sub check{
             eval "use $module";
             
             if( not $@ and $module->can('check') ){
-                my $retval = $module->check($value, $subhash);
-                $bool = 0 unless $retval;
+                $bool = $module->check($value, $subhash);
             }
             else{
                 croak "Can't check with $module";
@@ -421,6 +419,9 @@ sub _yaml_config{
     elsif(defined $file){
         $errstr = 'file does not exist';
         return undef;
+    }
+    else {
+        $errstr = 'Need path to YAML file';
     }
 
     return $self->{config};
