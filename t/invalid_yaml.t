@@ -13,6 +13,7 @@ sub MODULE() { 'Data::Validate::WithYAML' }
     my $obj = MODULE()->new( '/tmp/data-validate-withyaml-test.yml' );
     is $obj, undef;
     is $Data::Validate::WithYAML::errstr, 'file does not exist';
+    is MODULE()->errstr, 'file does not exist';
 }
 
 {
@@ -24,7 +25,15 @@ sub MODULE() { 'Data::Validate::WithYAML' }
 
     my $obj = MODULE()->new( $file );
     is $obj, undef;
-    like $Data::Validate::WithYAML::errstr, qr/YAML::Tiny failed to classify/
+    like $Data::Validate::WithYAML::errstr, qr/YAML::Tiny failed to classify/;
+    like MODULE()->errstr, qr/YAML::Tiny failed to classify/;
+}
+
+{
+    my $obj = MODULE()->new();
+    is $obj, undef;
+    like $Data::Validate::WithYAML::errstr, qr/Need path/;
+    like MODULE()->errstr, qr/Need path/;
 }
 
 done_testing();
