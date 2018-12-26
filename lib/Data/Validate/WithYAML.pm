@@ -9,7 +9,7 @@ use YAML::Tiny;
 
 # ABSTRACT: Validation framework that can be configured with YAML files
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 our $errstr  = '';
 
 =head1 SYNOPSIS
