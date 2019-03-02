@@ -1,8 +1,6 @@
-#!/usr/bin/env perl
- 
-use strict;
-use warnings;
+#!/usr/bin/env perl 
 
+use strict;
 use Test::More;
 use FindBin;
 
@@ -10,7 +8,10 @@ BEGIN {
     use_ok( 'Data::Validate::WithYAML' );
 }
 
-my $validator = Data::Validate::WithYAML->new( $FindBin::Bin . '/test.yml' );
+my $file = $FindBin::Bin . '/test.yml';
+my $yaml = do{ local (@ARGV, $/) = $file; <> };
+
+my $validator = Data::Validate::WithYAML->new( \$yaml );
 is $Data::Validate::WithYAML::errstr, '';
 
 my @valid_addresses = ('test@test.de','firstname.lastname.something@sub.domain.tld');
