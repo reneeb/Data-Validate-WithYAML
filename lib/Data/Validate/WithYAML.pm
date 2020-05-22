@@ -9,7 +9,7 @@ use YAML::Tiny;
 
 # ABSTRACT: Validation framework that can be configured with YAML files
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 our $errstr  = '';
 
 =head1 SYNOPSIS
@@ -308,13 +308,14 @@ sub check{
     my ($self,$field,$value,$definition) = @_;
     
     my %dispatch = (
-        min      => \&_min,
-        max      => \&_max,
-        regex    => \&_regex,
-        length   => \&_length,
-        enum     => \&_enum,
-        sub      => \&_sub,
-        datatype => \&_datatype,
+        min       => \&_min,
+        max       => \&_max,
+        regex     => \&_regex,
+        not_regex => \&_not_regex,
+        length    => \&_length,
+        enum      => \&_enum,
+        sub       => \&_sub,
+        datatype  => \&_datatype,
     );
                 
     my $subhash = $definition || $self->_required->{$field} || $self->_optional->{$field};
@@ -480,9 +481,29 @@ sub _max{
 }
 
 sub _regex{
-    my ($value,$regex) = @_;
-    my $re = qr/$regex/;
-    return ($value =~ $re);
+    my ($value,$regex_list) = @_;
+
+    my $regexes = ref $regex_list ? $regex_list : [$regex_list];
+
+    for my $regex ( @{ $regexes } ) {
+        my $re = qr/$regex/;
+        return 0 if $value !~ $re;
+    }
+
+    return 1;
+}
+
+sub _not_regex{
+    my ($value,$regex_list) = @_;
+
+    my $regexes = ref $regex_list ? $regex_list : [$regex_list];
+
+    for my $regex ( @{ $regexes } ) {
+        my $re = qr/$regex/;
+        return if $value =~ $re;
+    }
+
+    return 1;
 }
 
 sub _length{
