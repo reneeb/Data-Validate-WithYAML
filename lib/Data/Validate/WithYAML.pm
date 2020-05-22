@@ -9,7 +9,7 @@ use YAML::Tiny;
 
 # ABSTRACT: Validation framework that can be configured with YAML files
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 our $errstr  = '';
 
 =head1 SYNOPSIS
@@ -342,16 +342,26 @@ sub check{
             }
         }
         elsif( $key eq 'plugin' ){
-            my ($name)   = $subhash->{$key} =~ m{([A-z0-9_:]+)};
-            my $module   = 'Data::Validate::WithYAML::Plugin::' . $name;
-            eval "use $module";
-            
-            if( not $@ and $module->can('check') ){
-                $bool = $module->check($value, $subhash);
+            my $plugins = ref $subhash->{$key} ? $subhash->{$key} : [$subhash->{$key}];
+
+            my $one_not_ok = 0;
+
+            for my $plugin ( @{ $plugins } ) {
+                my ($name)   = $plugin =~ m{([A-z0-9_:]+)};
+                my $module   = 'Data::Validate::WithYAML::Plugin::' . $name;
+
+                eval "use $module";
+
+                if( not $@ and $module->can('check') ){
+                    my $local_bool = $module->check($value, $subhash);
+                    $one_not_ok = 1 if !$local_bool;
+                }
+                else{
+                    croak "Can't check with $module";
+                }
             }
-            else{
-                croak "Can't check with $module";
-            }
+
+            $bool = $one_not_ok ? 0 : 1;
         }
     }
     
